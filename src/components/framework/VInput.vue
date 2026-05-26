@@ -8,7 +8,12 @@
     :style="{
       width: width,
       height: '24px',
-      padding:clearable&&type=='password' ? '5px 50px 5px 5px' : clearable||type=='password' ? '5px 30px 5px 5px' : '5px 5px 5px 5px',
+      padding:
+        clearable && type == 'password'
+          ? '5px 50px 5px 5px'
+          : clearable || type == 'password'
+          ? '5px 30px 5px 5px'
+          : '5px 5px 5px 5px',
     }"
   >
     <span @click="focusInput" class="label">{{ label }}</span>
@@ -24,7 +29,7 @@
       @keydown="check($event)"
     />
     <slot name="appendIcon">
-      <fa-i
+      <!-- <fa-i
         v-if="clearable&&modelValue"
         @click="updateModelValue(modelValue, true);"
         icon="fa-solid fa-circle-xmark"
@@ -33,9 +38,15 @@
           top: '9px',
           right: type=='password'?'30px':'5px'
         }"
-      ></fa-i>
+      ></fa-i> -->
+      <span
+        class="appendIcon"
+        v-if="clearable && modelValue"
+        @click="updateModelValue(modelValue, true)"
+        >X</span
+      >
     </slot>
-      <fa-i
+    <!-- <fa-i
         v-if="type=='password'"
         @click="type_wrapper=type_wrapper=='password'?'text':'password'"
         :icon="type_wrapper=='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash'"
@@ -45,7 +56,7 @@
           right: '5px',
           opacity: '1'
         }"
-      ></fa-i>
+      ></fa-i> -->
   </div>
 </template>
 <script>
@@ -53,19 +64,19 @@ export default {
   props: {
     type: {
       type: String,
-      default: "text",
+      default: 'text',
     },
     label: {
       type: String,
-      default: "",
+      default: '',
     },
     modelValue: {
       type: [String, Number],
-      default: "",
+      default: '',
     },
     width: {
       type: String,
-      default: "auto",
+      default: 'auto',
     },
     rounded: {
       type: Boolean,
@@ -87,73 +98,65 @@ export default {
   data() {
     return {
       isFocused: false, // Gestisce lo stato di focus
-      type_wrapper:'text'
-    };
+      type_wrapper: 'text',
+    }
   },
   mounted() {
-    this.type_wrapper=this.type
+    this.type_wrapper = this.type
   },
   computed: {
     isValuePresent() {
-      if (this.type == "text"||this.type == "password") {
-        return (
-          this.modelValue !== null &&
-          this.modelValue !== undefined &&
-          this.modelValue !== ""
-        );
+      if (this.type == 'text' || this.type == 'password') {
+        return this.modelValue !== null && this.modelValue !== undefined && this.modelValue !== ''
       } else {
-        return (
-          this.modelValue !== null &&
-          this.modelValue !== undefined &&
-          !isNaN(this.modelValue)
-        );
+        return this.modelValue !== null && this.modelValue !== undefined && !isNaN(this.modelValue)
       }
     },
   },
   methods: {
     updateModelValue(value, clear) {
       if (clear) {
-        value = this.type == "text"||this.type == "password" ? "" : 0;
+        value = this.type == 'text' || this.type == 'password' ? '' : 0
       }
-      this.$emit("update:modelValue", value);
+      this.$emit('update:modelValue', value)
     },
     check(event) {
-      if (this.type == "number") {
+      if (this.type == 'number') {
         if (
-          event.key === "e" ||
-          event.key === "E" ||
-          event.key === "-" ||
-          event.key === "+" ||
-          event.key === ","
+          event.key === 'e' ||
+          event.key === 'E' ||
+          event.key === '-' ||
+          event.key === '+' ||
+          event.key === ','
         ) {
-          event.preventDefault();
+          event.preventDefault()
         }
       }
     },
     focusInput() {
-      this.$refs.Input.focus();
+      this.$refs.Input.focus()
     },
     onFocus() {
-      this.isFocused = true;
+      this.isFocused = true
     },
     onBlur() {
-      this.isFocused = false;
+      this.isFocused = false
     },
   },
-};
+}
 </script>
 <style scoped>
 /* Rimuove frecce in Chrome, Safari e Edge */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Rimuove frecce in Firefox */
-input[type="number"] {
-    -moz-appearance: textfield; /* Per Firefox */
-    appearance: textfield; /* Per altri browser */
+input[type='number'] {
+  -moz-appearance: textfield; /* Per Firefox */
+  appearance: textfield; /* Per altri browser */
 }
 .input-container {
   background: rgb(240, 240, 240);
@@ -170,7 +173,7 @@ input[type="number"] {
   position: relative;
 }
 
-.rounded{
+.rounded {
   border-radius: 8px;
 }
 

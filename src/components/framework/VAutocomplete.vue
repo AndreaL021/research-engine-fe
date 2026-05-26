@@ -30,13 +30,19 @@
     />
     <!-- @blur="onBlur" -->
     <slot name="appendIcon">
-      <fa-i
+      <!-- <fa-i
         v-if="clearable && !readonly && model"
         @click="onfocus, selectItem(model, true)"
         icon="fa-solid fa-circle-xmark"
         class="appendIcon"
         :size="outlined ? 'lg' : null"
-      ></fa-i>
+      ></fa-i> -->
+      <span
+        class="appendIcon"
+        v-if="clearable && !readonly && model"
+        @click="onfocus, selectItem(model, true)"
+        >X</span
+      >
     </slot>
     <transition name="fade" appear>
       <div
@@ -46,7 +52,7 @@
         @mousedown="onDropdownMouseDown"
       >
         <div v-if="multiple && !select && !readonly">
-          <div class="input_container" style="display: flex; align-items: center;">
+          <div class="input_container" style="display: flex; align-items: center">
             <span
               @click="focusInput"
               style="font-size: 13px; margin-left: 5px; margin-right: 5px"
@@ -79,11 +85,11 @@ export default {
   props: {
     label: {
       type: String,
-      default: "",
+      default: '',
     },
     modelValue: {
       type: [String, Number, Array],
-      default: "",
+      default: '',
     },
     multiple: {
       type: Boolean,
@@ -103,7 +109,7 @@ export default {
     },
     width: {
       type: String,
-      default: "auto",
+      default: 'auto',
     },
     rounded: {
       type: Boolean,
@@ -127,231 +133,210 @@ export default {
     },
     searchLabel: {
       type: String,
-      default: "search",
+      default: 'search',
     },
   },
   data() {
     return {
       isFocused: false, // Gestisce lo stato di focus
-      model: "",
-      search: "",
+      model: '',
+      search: '',
       filteredItems: [],
       dropdown: false,
       isClickingDropdownItem: false,
-    };
+    }
   },
   beforeUnmount() {
-    document.removeEventListener("click", this.handleClickOutside);
+    document.removeEventListener('click', this.handleClickOutside)
   },
   mounted() {
-    document.addEventListener("click", this.handleClickOutside);
-    this.filteredItems = Array.from(this.items);
-    this.updateModelDisplay();
+    document.addEventListener('click', this.handleClickOutside)
+    this.filteredItems = Array.from(this.items)
+    this.updateModelDisplay()
     if (!this.itemText && !this.itemValue) {
       if (this.multiple) {
-        let selected = [];
+        let selected = []
         this.modelValue.forEach((i) => {
-          let newItem = this.filteredItems.find((a) => a == i);
+          let newItem = this.filteredItems.find((a) => a == i)
           if (newItem) {
-            selected.push(newItem);
+            selected.push(newItem)
           }
-        });
-        selected.forEach(
-          (item, i) => (this.model = this.model + (i == 0 ? "" : " - ") + item)
-        );
+        })
+        selected.forEach((item, i) => (this.model = this.model + (i == 0 ? '' : ' - ') + item))
       } else {
-        this.model = this.modelValue;
+        this.model = this.modelValue
       }
     } else {
       if (this.multiple) {
-        let selected = [];
+        let selected = []
         this.modelValue.forEach((item) => {
-          let newItem = this.filteredItems.find(
-            (a) => a[this.itemValue] == item
-          );
+          let newItem = this.filteredItems.find((a) => a[this.itemValue] == item)
           if (newItem) {
-            selected.push(newItem);
+            selected.push(newItem)
           }
-        });
+        })
         selected.forEach(
-          (item, i) =>
-            (this.model =
-              this.model + (i == 0 ? "" : " - ") + item[this.itemText])
-        );
+          (item, i) => (this.model = this.model + (i == 0 ? '' : ' - ') + item[this.itemText])
+        )
       } else {
         this.model =
-          this.filteredItems.filter((i) => i[this.itemValue] == this.modelValue)
-            .length > 0
-            ? this.filteredItems.filter(
-                (i) => i[this.itemValue] == this.modelValue
-              )[0][this.itemText]
-            : "";
+          this.filteredItems.filter((i) => i[this.itemValue] == this.modelValue).length > 0
+            ? this.filteredItems.filter((i) => i[this.itemValue] == this.modelValue)[0][
+                this.itemText
+              ]
+            : ''
       }
     }
   },
   watch: {
     items(newVal) {
       if (newVal) {
-        this.filteredItems = Array.from(newVal);
+        this.filteredItems = Array.from(newVal)
       }
     },
     modelValue() {
-      this.updateModelDisplay();
-      this.search="";
+      this.updateModelDisplay()
+      this.search = ''
       if (!this.select) {
-        this.filtra(null);
+        this.filtra(null)
       }
     },
   },
   computed: {
     isValuePresent() {
-      return (
-        this.model !== null && this.model !== undefined && this.model !== ""
-      );
+      return this.model !== null && this.model !== undefined && this.model !== ''
     },
   },
   methods: {
     updateModelDisplay() {
       if (!this.itemText && !this.itemValue) {
-        this.model = this.multiple
-          ? this.modelValue.join(" - ")
-          : this.modelValue;
+        this.model = this.multiple ? this.modelValue.join(' - ') : this.modelValue
       } else {
         if (this.multiple) {
           const texts = this.modelValue.map((item) => {
-            const temp = this.items.find((a) => a[this.itemValue] == item);
-            return temp ? temp[this.itemText] : "";
-          });
-          this.model = texts.filter(Boolean).join(" - ");
+            const temp = this.items.find((a) => a[this.itemValue] == item)
+            return temp ? temp[this.itemText] : ''
+          })
+          this.model = texts.filter(Boolean).join(' - ')
         } else {
-          const temp = this.items.find(
-            (a) => a[this.itemValue] == this.modelValue
-          );
-          this.model = temp ? temp[this.itemText] : "";
+          const temp = this.items.find((a) => a[this.itemValue] == this.modelValue)
+          this.model = temp ? temp[this.itemText] : ''
         }
       }
     },
     handleClickOutside(e) {
       if (!this.$el.contains(e.target)) {
-        this.dropdown = false;
-        this.isFocused = false;
+        this.dropdown = false
+        this.isFocused = false
       }
     },
     checkSelected(item) {
       if (this.itemText && this.itemValue) {
         if (this.multiple) {
-          return (
-            this.modelValue.filter((i) => i == item[this.itemValue]).length > 0
-          );
+          return this.modelValue.filter((i) => i == item[this.itemValue]).length > 0
         } else {
-          return this.model == item[this.itemText];
+          return this.model == item[this.itemText]
         }
       } else {
         if (this.multiple) {
-          return this.modelValue.filter((i) => i == item).length > 0;
+          return this.modelValue.filter((i) => i == item).length > 0
         } else {
-          return this.model == item;
+          return this.model == item
         }
       }
     },
     filtra(item) {
       if (!item) {
-        this.filteredItems = [...this.items];
-        return;
+        this.filteredItems = [...this.items]
+        return
       }
       if (this.itemText && this.itemValue) {
         this.filteredItems = this.items.filter((i) =>
-          i[this.itemText]
-            .toString()
-            .toLowerCase()
-            .includes(item.toString().toLowerCase())
-        );
+          i[this.itemText].toString().toLowerCase().includes(item.toString().toLowerCase())
+        )
       } else {
         this.filteredItems = this.items.filter((i) =>
           i.toString().toLowerCase().includes(item.toString().toLowerCase())
-        );
+        )
       }
     },
     selectItem(item, clear) {
       if (clear) {
-        item = "";
+        item = ''
         if (this.multiple) {
-          this.$emit("update:modelValue", []);
-          this.$emit("change");
-          return;
+          this.$emit('update:modelValue', [])
+          this.$emit('change')
+          return
         } else {
-          this.$emit("update:modelValue", null);
-          this.$emit("change");
-          return;
+          this.$emit('update:modelValue', null)
+          this.$emit('change')
+          return
         }
       }
 
       if (!this.itemValue && !this.itemText) {
         // Caso semplice (array di valori primitivi)
         if (this.multiple) {
-          let newVal = [...this.modelValue]; // copia sicura
-          const index = newVal.indexOf(item);
+          let newVal = [...this.modelValue] // copia sicura
+          const index = newVal.indexOf(item)
           if (index >= 0) {
-            newVal.splice(index, 1); // rimuovi
+            newVal.splice(index, 1) // rimuovi
           } else {
-            newVal.push(item); // aggiungi
+            newVal.push(item) // aggiungi
           }
-          this.$emit("update:modelValue", [...newVal]); // emetti nuova copia
-          this.$emit("change");
+          this.$emit('update:modelValue', [...newVal]) // emetti nuova copia
+          this.$emit('change')
         } else {
-          const newVal = this.modelValue === item ? null : item;
-          this.model = newVal || "";
-          this.$emit("update:modelValue", newVal);
-          this.$emit("change");
+          const newVal = this.modelValue === item ? null : item
+          this.model = newVal || ''
+          this.$emit('update:modelValue', newVal)
+          this.$emit('change')
         }
       } else {
         // Caso con itemText / itemValue
         if (this.multiple) {
-          let newVal = [...this.modelValue]; // copia sicura
-          const id = item[this.itemValue];
-          const index = newVal.indexOf(id);
+          let newVal = [...this.modelValue] // copia sicura
+          const id = item[this.itemValue]
+          const index = newVal.indexOf(id)
           if (index >= 0) {
-            newVal.splice(index, 1); // rimuovi
+            newVal.splice(index, 1) // rimuovi
           } else {
-            newVal.push(id); // aggiungi
+            newVal.push(id) // aggiungi
           }
-          this.$emit("update:modelValue", [...newVal]); // forza reattività
-          this.$emit("change");
+          this.$emit('update:modelValue', [...newVal]) // forza reattività
+          this.$emit('change')
         } else {
-          const newVal =
-            this.modelValue === item[this.itemValue]
-              ? null
-              : item[this.itemValue];
-          this.$emit("update:modelValue", newVal);
-          this.$emit("change");
+          const newVal = this.modelValue === item[this.itemValue] ? null : item[this.itemValue]
+          this.$emit('update:modelValue', newVal)
+          this.$emit('change')
         }
       }
 
       if (!this.multiple) {
-        this.dropdown = false;
+        this.dropdown = false
       }
 
-      this.isClickingDropdownItem = false;
+      this.isClickingDropdownItem = false
     },
 
     onFocus() {
-      this.$refs.Input.focus();
-      this.isFocused = true;
-      this.dropdown = true;
-      this.filteredItems = Array.from(this.items);
+      this.$refs.Input.focus()
+      this.isFocused = true
+      this.dropdown = true
+      this.filteredItems = Array.from(this.items)
     },
     onBlur() {
       if (!this.isClickingDropdownItem) {
-        this.isFocused = false;
-        this.dropdown = false;
+        this.isFocused = false
+        this.dropdown = false
       }
-      this.isClickingDropdownItem = false;
+      this.isClickingDropdownItem = false
     },
     onDropdownMouseDown() {
-      this.isClickingDropdownItem = true;
+      this.isClickingDropdownItem = true
     },
   },
-};
+}
 </script>
 <style scoped>
 .input-container {
