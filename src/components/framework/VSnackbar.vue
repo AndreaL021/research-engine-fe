@@ -1,9 +1,5 @@
 <template>
-  <div
-    ref="snackbar"
-    class="snackbar"
-    :style="{ backgroundColor: bgColor, color: color  }"
-  >
+  <div ref="snackbar" class="snackbar" :style="{ backgroundColor: bgColor, color: color }">
     {{ msg }}
   </div>
 </template>
@@ -13,43 +9,44 @@ export default {
   props: {
     modelValue: {
       type: String,
-      default: "",
+      default: '',
     },
     bgColor: {
       type: String,
-      default: "rgb(72, 109, 254)",
+      default: 'red',
+      // default: "rgb(72, 109, 254)",
     },
     color: {
       type: String,
-      default: "white",
+      default: 'white',
     },
   },
   data() {
     return {
-      msg: "",
-    };
+      msg: '',
+    }
   },
   watch: {
     modelValue(newVal) {
       if (newVal) {
-        this.msg = this.modelValue;
-        this.show();
+        this.msg = this.modelValue
+        this.show()
       }
     },
   },
   methods: {
     show() {
-      var x = this.$refs.snackbar;
-      x.className += " show";
+      var x = this.$refs.snackbar
+      x.className += ' show'
       // y=this.$emit
       setTimeout(function () {
-        x.className = x.className.replace("show", "");
-        this.msg = "";
-      }, 4000);
-      this.$emit("update:modelValue", "");
+        x.className = x.className.replace('show', '')
+        this.msg = ''
+      }, 4000)
+      this.$emit('update:modelValue', '')
     },
   },
-};
+}
 </script>
   
 <style scoped>

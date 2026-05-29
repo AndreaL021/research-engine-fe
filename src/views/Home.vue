@@ -3,6 +3,9 @@
     <div class="result_container">
       <div class="card" v-for="(document, i) in documents" :key="i">
         <div>
+          <b>Similarity: {{ ((1 - document.distance) * 100).toFixed(1) }}%</b>
+        </div>
+        <div style="margin-top: 10px">
           <b>Title: {{ document.title }}</b>
         </div>
         <div style="margin-top: 10px">
@@ -31,15 +34,25 @@
       </div>
     </div>
     <div class="searchbar" :class="{ fixed: documents.length > 0 }">
-      <div style="display: flex">
-        <v-input
-          rounded
-          @keydown.enter="search"
-          width="50vw"
-          v-model="query"
-          label="Ask anything"
-        ></v-input>
-        <button class="button" @click="search" style="margin-left: 10px">Search</button>
+      <div style="display: flex; flex-direction: column">
+        <v-autocomplete
+          v-model="selected_provider"
+          :items="providers"
+          width="10vw"
+          label="Provider"
+          style="margin-bottom: 10px"
+        ></v-autocomplete>
+
+        <div style="display: flex">
+          <v-input
+            rounded
+            @keydown.enter="search"
+            width="50vw"
+            v-model="query"
+            label="Ask anything"
+          ></v-input>
+          <button class="button" @click="search" style="margin-left: 10px">Search</button>
+        </div>
       </div>
     </div>
     <v-overlay v-model="overlay"></v-overlay>
@@ -54,7 +67,10 @@ export default {
       overlay: false,
       message: '',
       query: '',
+      selected_provider: 'ddgs',
       documents: [],
+      similar_chunks: [],
+      providers: ['ddgs', 'exa'],
     }
   },
 
@@ -68,16 +84,20 @@ export default {
       try {
         this.overlay = true
 
-        const result = await retrieveDocuments(this.query)
+        const result = await retrieveDocuments(this.query, this.selected_provider)
 
         this.documents = result.documents.map((document) => ({
           ...document,
           expanded: false,
         }))
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        })
       } catch (error) {
         console.log(error)
 
-        this.message = 'Search error'
+        this.message = error.message
       } finally {
         this.overlay = false
       }
@@ -102,7 +122,7 @@ export default {
 .result_container {
   overflow-y: auto;
   padding: 20px;
-  padding-bottom: 100px;
+  padding-top: 120px;
 }
 
 .searchbar {
@@ -113,10 +133,10 @@ export default {
 
 .searchbar.fixed {
   background-color: rgb(202, 202, 202);
-  border-top: 2px solid rgb(104, 104, 104);
+  border-bottom: 2px solid rgb(104, 104, 104);
 
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
 
   width: 100%;
