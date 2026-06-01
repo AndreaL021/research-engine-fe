@@ -1,6 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL
 
-export async function retrieveDocuments (query, provider) {
+export async function retrieveDocuments (query, provider, retrievalMode) {
     const response = await fetch(API_URL+"/research", {
         method: "POST",
         headers: {
@@ -8,7 +8,8 @@ export async function retrieveDocuments (query, provider) {
         },
         body: JSON.stringify({
             query,
-            provider
+            provider,
+            retrieval_mode: retrievalMode
         }),
     })
 

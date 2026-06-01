@@ -3,7 +3,7 @@
     <div class="result_container">
       <div class="card" v-for="(document, i) in documents" :key="i">
         <div>
-          <b>Similarity: {{ ((1 - document.distance) * 100).toFixed(1) }}%</b>
+          <b>Score: {{ (document.score * 100).toFixed(1) }}%</b>
         </div>
         <div style="margin-top: 10px">
           <b>Title: {{ document.title }}</b>
@@ -35,13 +35,23 @@
     </div>
     <div class="searchbar" :class="{ fixed: documents.length > 0 }">
       <div style="display: flex; flex-direction: column">
-        <v-autocomplete
-          v-model="selected_provider"
-          :items="providers"
-          width="10vw"
-          label="Provider"
-          style="margin-bottom: 10px"
-        ></v-autocomplete>
+        <div style="display: flex">
+          <v-autocomplete
+            v-model="selected_provider"
+            :items="providers"
+            width="10vw"
+            label="Provider"
+            style="margin-bottom: 10px"
+          ></v-autocomplete>
+
+          <v-autocomplete
+            v-model="selected_retrieval_mode"
+            :items="retrieval_modes"
+            width="10vw"
+            label="Retrieval"
+            style="margin-bottom: 10px"
+          ></v-autocomplete>
+        </div>
 
         <div style="display: flex">
           <v-input
@@ -67,10 +77,12 @@ export default {
       overlay: false,
       message: '',
       query: '',
-      selected_provider: 'ddgs',
       documents: [],
       similar_chunks: [],
-      providers: ['ddgs', 'exa'],
+      selected_provider: 'searxng',
+      providers: ['searxng', 'ddgs', 'exa'],
+      selected_retrieval_mode: 'semantic',
+      retrieval_modes: ['semantic', 'lexical'],
     }
   },
 
@@ -84,7 +96,11 @@ export default {
       try {
         this.overlay = true
 
-        const result = await retrieveDocuments(this.query, this.selected_provider)
+        const result = await retrieveDocuments(
+          this.query,
+          this.selected_provider,
+          this.selected_retrieval_mode
+        )
 
         this.documents = result.documents.map((document) => ({
           ...document,
