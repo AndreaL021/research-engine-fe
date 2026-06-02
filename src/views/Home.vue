@@ -1,9 +1,26 @@
 <template>
   <div class="container" :class="{ centered: documents.length === 0 }">
     <div class="result_container">
+      <div class="card" v-if="answer">
+        <div>
+          <b>Answer:</b>
+        </div>
+        <div style="margin-top: 10px; white-space: pre-wrap">
+          {{ answer }}
+        </div>
+      </div>
       <div class="card" v-for="(document, i) in documents" :key="i">
         <div>
           <b>Score: {{ (document.score * 100).toFixed(1) }}%</b>
+        </div>
+        <div style="margin-top: 10px">
+          <b>Provider:</b> {{ document.provider }} <b>| Source: </b>{{ document.source_type }}
+          <b>| Content: </b>{{ document.content_type }} <b>| Reliability: </b
+          >{{ document.source_reliability }}%
+          <b><span v-if="document.search_engine"> | Engine: </span></b>{{ document.search_engine }}
+          <b><span v-if="document.search_category"> | Category: </span></b
+          >{{ document.search_category }}
+          <b><span v-if="document.published_at"> | Published: </span></b>{{ document.published_at }}
         </div>
         <div style="margin-top: 10px">
           <b>Title: {{ document.title }}</b>
@@ -77,6 +94,7 @@ export default {
       overlay: false,
       message: '',
       query: '',
+      answer: '',
       documents: [],
       similar_chunks: [],
       selected_provider: 'searxng',
@@ -101,6 +119,8 @@ export default {
           this.selected_provider,
           this.selected_retrieval_mode
         )
+
+        this.answer = result.answer
 
         this.documents = result.documents.map((document) => ({
           ...document,
