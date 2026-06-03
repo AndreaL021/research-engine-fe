@@ -20,6 +20,9 @@
           <b><span v-if="document.search_engine"> | Engine: </span></b>{{ document.search_engine }}
           <b><span v-if="document.search_category"> | Category: </span></b
           >{{ document.search_category }}
+          <b><span v-if="document.author"> | Author: </span></b>{{ document.author }}
+          <b><span v-if="document.categories"> | Categories: </span></b>{{ document.categories }}
+          <b><span v-if="document.tags"> | Tags: </span></b>{{ document.tags }}
           <b><span v-if="document.published_at"> | Published: </span></b>{{ document.published_at }}
         </div>
         <div style="margin-top: 10px">
