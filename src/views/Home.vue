@@ -11,7 +11,11 @@
       </div>
       <div class="card" v-for="(document, i) in documents" :key="i">
         <div>
-          <b>Score: {{ (document.score * 100).toFixed(1) }}%</b>
+          <b>Source {{ document.source_number || i + 1 }}</b>
+          <span v-if="document.chunk_index !== null && document.chunk_index !== undefined">
+            <b>| Chunk: </b>{{ document.chunk_index }}
+          </span>
+          <b>| Score: {{ (document.score * 100).toFixed(1) }}%</b>
         </div>
         <div style="margin-top: 10px">
           <b>Provider:</b> {{ document.provider }} <b>| Source: </b>{{ document.source_type }}
