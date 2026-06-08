@@ -9,6 +9,38 @@
           {{ answer }}
         </div>
       </div>
+      <div class="card" v-if="follow_up_questions.length">
+        <div>
+          <b>Follow-up research questions:</b>
+        </div>
+        <div
+          v-for="(question, index) in follow_up_questions"
+          :key="index"
+          style="margin-top: 10px"
+        >
+          {{ index + 1 }}. {{ question }}
+        </div>
+      </div>
+      <div class="card" v-if="evidence_relations.length">
+        <div>
+          <b>Evidence relations:</b>
+        </div>
+        <div
+          v-for="(relation, index) in evidence_relations"
+          :key="index"
+          style="margin-top: 10px"
+        >
+          <b>{{ relation.relation_type }}</b>
+          <span> | Confidence: {{ relation.confidence }}%</span>
+          <div v-if="relation.explanation">{{ relation.explanation }}</div>
+          <div style="margin-top: 6px">
+            <b>Claim A:</b> {{ relation.claim_a }}
+          </div>
+          <div>
+            <b>Claim B:</b> {{ relation.claim_b }}
+          </div>
+        </div>
+      </div>
       <div class="card" v-for="(document, i) in documents" :key="i">
         <div>
           <b>Source {{ document.source_number || i + 1 }}</b>
@@ -102,6 +134,8 @@ export default {
       message: '',
       query: '',
       answer: '',
+      follow_up_questions: [],
+      evidence_relations: [],
       documents: [],
       similar_chunks: [],
       selected_provider: 'searxng',
@@ -128,6 +162,8 @@ export default {
         )
 
         this.answer = result.answer
+        this.follow_up_questions = result.follow_up_questions || []
+        this.evidence_relations = result.evidence_relations || []
 
         this.documents = result.documents.map((document) => ({
           ...document,
