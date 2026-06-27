@@ -1,44 +1,12 @@
 <template>
   <div class="container" :class="{ centered: documents.length === 0 }">
     <div class="result_container">
-      <div class="card" v-if="answer">
+      <div class="card" style="margin-top: 50px; margin-bottom: 50px" v-if="answer">
         <div>
           <b>Answer:</b>
         </div>
         <div style="margin-top: 10px; white-space: pre-wrap">
           {{ answer }}
-        </div>
-      </div>
-      <div class="card" v-if="follow_up_questions.length">
-        <div>
-          <b>Follow-up research questions:</b>
-        </div>
-        <div
-          v-for="(question, index) in follow_up_questions"
-          :key="index"
-          style="margin-top: 10px"
-        >
-          {{ index + 1 }}. {{ question }}
-        </div>
-      </div>
-      <div class="card" v-if="evidence_relations.length">
-        <div>
-          <b>Evidence relations:</b>
-        </div>
-        <div
-          v-for="(relation, index) in evidence_relations"
-          :key="index"
-          style="margin-top: 10px"
-        >
-          <b>{{ relation.relation_type }}</b>
-          <span> | Confidence: {{ relation.confidence }}%</span>
-          <div v-if="relation.explanation">{{ relation.explanation }}</div>
-          <div style="margin-top: 6px">
-            <b>Claim A:</b> {{ relation.claim_a }}
-          </div>
-          <div>
-            <b>Claim B:</b> {{ relation.claim_b }}
-          </div>
         </div>
       </div>
       <div class="card" v-for="(document, i) in documents" :key="i">
@@ -55,11 +23,11 @@
           >{{ document.source_reliability }}%
           <b><span v-if="document.search_engine"> | Engine: </span></b>{{ document.search_engine }}
           <b><span v-if="document.search_category"> | Category: </span></b
-          >{{ document.search_category }}
-          <b><span v-if="document.author"> | Author: </span></b>{{ document.author }}
-          <b><span v-if="document.categories"> | Categories: </span></b>{{ document.categories }}
-          <b><span v-if="document.tags"> | Tags: </span></b>{{ document.tags }}
-          <b><span v-if="document.published_at"> | Published: </span></b>{{ document.published_at }}
+          >{{ document.search_category }} <b><span v-if="document.author"> | Author: </span></b
+          >{{ document.author }} <b><span v-if="document.categories"> | Categories: </span></b
+          >{{ document.categories }} <b><span v-if="document.tags"> | Tags: </span></b
+          >{{ document.tags }} <b><span v-if="document.published_at"> | Published: </span></b
+          >{{ document.published_at }}
         </div>
         <div style="margin-top: 10px">
           <b>Title: {{ document.title }}</b>
@@ -99,14 +67,6 @@
             label="Provider"
             style="margin-bottom: 10px"
           ></v-autocomplete>
-
-          <v-autocomplete
-            v-model="selected_retrieval_mode"
-            :items="retrieval_modes"
-            width="10vw"
-            label="Retrieval"
-            style="margin-bottom: 10px"
-          ></v-autocomplete>
         </div>
 
         <div style="display: flex">
@@ -134,14 +94,9 @@ export default {
       message: '',
       query: '',
       answer: '',
-      follow_up_questions: [],
-      evidence_relations: [],
       documents: [],
-      similar_chunks: [],
-      selected_provider: 'searxng',
-      providers: ['searxng', 'ddgs', 'exa'],
-      selected_retrieval_mode: 'semantic',
-      retrieval_modes: ['semantic', 'lexical'],
+      selected_provider: 'ddgs',
+      providers: ['ddgs', 'exa'],
     }
   },
 
@@ -155,15 +110,9 @@ export default {
       try {
         this.overlay = true
 
-        const result = await retrieveDocuments(
-          this.query,
-          this.selected_provider,
-          this.selected_retrieval_mode
-        )
+        const result = await retrieveDocuments(this.query, this.selected_provider)
 
         this.answer = result.answer
-        this.follow_up_questions = result.follow_up_questions || []
-        this.evidence_relations = result.evidence_relations || []
 
         this.documents = result.documents.map((document) => ({
           ...document,
